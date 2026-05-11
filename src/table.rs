@@ -1,11 +1,13 @@
 use comfy_table::Table;
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
-use serde_derive::Deserialize;
-use std::io::{self};
+use core::error;
+use csv::{self, Writer};
+use serde_derive::{Deserialize, Serialize};
+use std::io::{self, Write};
 
 // Table data input
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AnimeSheet {
     pub anime_count: String,
     pub anime_title: String,
@@ -13,25 +15,26 @@ pub struct AnimeSheet {
     pub user_rating: String,
 }
 
+// Take user input for filling out the spreadsheet
 pub fn fill_table() -> AnimeSheet {
     println!("Enter anime count: ");
     let mut anime_count = String::new();
-    io::stdin().read_line(&mut anime_count);
+    let _ = io::stdin().read_line(&mut anime_count);
     let anime_count = anime_count.trim().to_string();
 
     println!("Enter anime title: ");
     let mut anime_title = String::new();
-    io::stdin().read_line(&mut anime_title);
+    let _ = io::stdin().read_line(&mut anime_title);
     let anime_title = anime_title.trim().to_string();
 
     println!("Enter episode count: ");
     let mut episode_count = String::new();
-    io::stdin().read_line(&mut episode_count);
+    let _ = io::stdin().read_line(&mut episode_count);
     let episode_count = episode_count.trim().to_string();
 
-    println!("Enter your rating: ");
+    println!("\nEnter your rating: ");
     let mut user_rating = String::new();
-    io::stdin().read_line(&mut user_rating);
+    let _ = io::stdin().read_line(&mut user_rating);
     let user_rating = user_rating.trim().to_string();
 
     //Return the struct
@@ -44,9 +47,22 @@ pub fn fill_table() -> AnimeSheet {
 }
 
 // Define the Table
-pub fn create_table() {
+pub fn create_table() -> Result<(), Box<dyn error::Error>> {
     let sheet = fill_table();
     let mut anime_table = Table::new();
+
+    //Write and save to file
+    let file = std::fs::OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open("anime.csv")?;
+
+    let mut wtr = csv::WriterBuilder::new()
+        .has_headers(false)
+        .from_writer(file);
+
+    wtr.serialize(&sheet)?;
+    wtr.flush()?;
 
     // defines table properties
     anime_table
@@ -64,4 +80,5 @@ pub fn create_table() {
     anime_table.add_row(rows);
     // Print the table
     println!("{anime_table}");
+    Ok(())
 }

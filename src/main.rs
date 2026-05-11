@@ -3,6 +3,7 @@
 use crate::table::create_table;
 mod table;
 
-fn main() {
-    create_table();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    create_table()?;
+    Ok(())
 }
