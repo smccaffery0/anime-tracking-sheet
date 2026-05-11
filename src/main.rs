@@ -1,8 +1,8 @@
 //! Entry point for 'anime-tracking-sheet'
 #![allow(clippy::cargo_common_metadata)]
-use std::{error::Error, io, process::exit};
+use std::{io, process::exit};
 
-use crate::table::{create_table, get_table};
+use crate::table::{create_table, draw_table};
 mod table;
 
 // Display menu for user
@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // match based on user input
     match option_selected {
         "1" => create_table()?,
-        "2" => get_table(),
+        "2" => draw_table()?,
         "3" => exit(0),
         _ => println!("Not an option!"),
     }

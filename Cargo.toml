@@ -13,6 +13,7 @@ categories      = []
 [dependencies]
 clap = "4.6.1"
 comfy-table = "7.2.2"
+csv = "1.4.0"
 serde = "1.0.228"
 serde_derive = "1.0.228"
 serde_json = "1.0.149"

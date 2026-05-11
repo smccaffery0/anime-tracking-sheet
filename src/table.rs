@@ -13,6 +13,7 @@ pub struct AnimeSheet {
     pub anime_title: String,
     pub episode_count: String,
     pub user_rating: String,
+    //pub anime_status: String,
 }
 
 // Take user input for filling out the spreadsheet
@@ -37,18 +38,26 @@ pub fn fill_table() -> AnimeSheet {
     let _ = io::stdin().read_line(&mut user_rating);
     let user_rating = user_rating.trim().to_string();
 
+    //TODO! //Create another column for progress/status
+    //println!("\nEnter your rating: ");
+    //let mut user_rating = String::new();
+    //let _ = io::stdin().read_line(&mut user_rating);
+    //let user_rating = user_rating.trim().to_string();
+
     //Return the struct
     AnimeSheet {
         anime_count,
         anime_title,
         episode_count,
         user_rating,
+        //anime_status,
     }
 }
 
 // Define the Table
 pub fn create_table() -> Result<(), Box<dyn error::Error>> {
     let sheet = fill_table();
+
     let mut anime_table = Table::new();
 
     //Write and save to file
@@ -76,12 +85,13 @@ pub fn create_table() -> Result<(), Box<dyn error::Error>> {
         &sheet.anime_title,
         &sheet.episode_count,
         &sheet.user_rating,
+        //&sheet.anime_status,
     ];
     anime_table.add_row(rows);
     Ok(())
 }
 
-pub fn get_table() {
-    let anime_table = create_table();
-    println!("{:#?}", anime_table);
+pub fn draw_table() -> Result<(), Box<dyn std::error::Error>> {
+    //TODO! //read and print out table
+    Ok(())
 }
