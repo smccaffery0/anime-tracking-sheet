@@ -2,9 +2,9 @@ use comfy_table::Table;
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use core::error;
-use csv::{self, Writer};
+use csv::{self};
 use serde_derive::{Deserialize, Serialize};
-use std::io::{self, Write};
+use std::io::{self};
 
 // Table data input
 #[derive(Serialize, Deserialize, Debug)]
@@ -78,7 +78,10 @@ pub fn create_table() -> Result<(), Box<dyn error::Error>> {
         &sheet.user_rating,
     ];
     anime_table.add_row(rows);
-    // Print the table
-    println!("{anime_table}");
     Ok(())
+}
+
+pub fn get_table() {
+    let anime_table = create_table();
+    println!("{:#?}", anime_table);
 }

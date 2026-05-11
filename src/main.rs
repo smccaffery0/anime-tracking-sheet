@@ -1,9 +1,31 @@
 //! Entry point for 'anime-tracking-sheet'
 #![allow(clippy::cargo_common_metadata)]
-use crate::table::create_table;
+use std::{error::Error, io, process::exit};
+
+use crate::table::{create_table, get_table};
 mod table;
 
+// Display menu for user
+fn menu() {
+    println!("[1] => Add new anime");
+    println!("[2] => View Anime Table");
+    println!("[3] => Quit");
+}
+
+// Get option input for user
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    create_table()?;
+    menu();
+    println!("Select an option: ");
+    let mut option_selected = String::new();
+    let _ = io::stdin().read_line(&mut option_selected);
+    let option_selected = option_selected.trim();
+
+    // match based on user input
+    match option_selected {
+        "1" => create_table()?,
+        "2" => get_table(),
+        "3" => exit(0),
+        _ => println!("Not an option!"),
+    }
     Ok(())
 }
