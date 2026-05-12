@@ -16,7 +16,7 @@ pub struct AnimeSheet {
     pub anime_title: String,
     pub episode_count: String,
     pub user_rating: String,
-    //pub anime_status: String,
+    pub user_progress: String,
 }
 
 // Take user input for filling out the spreadsheet
@@ -41,11 +41,11 @@ pub fn fill_table() -> AnimeSheet {
     let _ = stdin().read_line(&mut user_rating);
     let user_rating = user_rating.trim().to_string();
 
-    //TODO! //Create another column for progress/status
-    //println!("\nEnter your rating: ");
-    //let mut user_rating = String::new();
-    //let _ = io::stdin().read_line(&mut user_rating);
-    //let user_rating = user_rating.trim().to_string();
+    //progress
+    println!("\nEnter your rating: ");
+    let mut user_progress = String::new();
+    let _ = io::stdin().read_line(&mut user_progress);
+    let user_progress = user_progress.trim().to_string();
 
     //Return the struct
     AnimeSheet {
@@ -53,7 +53,7 @@ pub fn fill_table() -> AnimeSheet {
         anime_title,
         episode_count,
         user_rating,
-        //anime_status,
+        user_progress,
     }
 }
 
@@ -86,14 +86,20 @@ pub fn create_table() -> Result<(), Box<dyn error::Error>> {
                 .load_preset(UTF8_FULL)
                 .apply_modifier(UTF8_ROUND_CORNERS)
                 .set_content_arrangement(comfy_table::ContentArrangement::DynamicFullWidth)
-                .set_header(vec!["Count", "Title", "Episodes", "Rating"]);
+                .set_header(vec![
+                    "Count",
+                    "Title",
+                    "Episodes",
+                    "Rating",
+                    "User Progress",
+                ]);
 
             let rows = vec![
                 &sheet.anime_count,
                 &sheet.anime_title,
                 &sheet.episode_count,
                 &sheet.user_rating,
-                //&sheet.anime_status,
+                &sheet.user_progress,
             ];
             anime_table.add_row(rows);
             println!("Do want to enter another title: ");
