@@ -6,17 +6,48 @@ use csv::{self};
 use serde_derive::{Deserialize, Serialize};
 use std::{
     io::{self, stdin},
-    process::exit,
+    process::{Command, exit},
 };
 
 // Table data input
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AnimeSheet {
-    pub anime_count: String,
-    pub anime_title: String,
-    pub episode_count: String,
-    pub user_rating: String,
-    pub user_progress: String,
+    anime_count: String,
+    anime_title: String,
+    episode_count: String,
+    user_rating: String,
+    user_progress: String,
+}
+
+// Anime status possible states
+#[derive(Debug)]
+pub enum AnimeStatus {
+    Completed,
+    InProgress,
+    Dropped,
+    PlanOnWatching,
+}
+
+impl AnimeStatus {
+    fn check(&self) {
+        match self {
+            AnimeStatus::Completed => {
+                println!("Anime is completed");
+            }
+
+            AnimeStatus::InProgress => {
+                println!("Anime is in progress");
+            }
+
+            AnimeStatus::Dropped => {
+                println!("Anime was dropped");
+            }
+
+            AnimeStatus::PlanOnWatching => {
+                println!("Plan on watching");
+            }
+        }
+    }
 }
 
 // Take user input for filling out the spreadsheet
@@ -42,10 +73,24 @@ pub fn fill_table() -> AnimeSheet {
     let user_rating = user_rating.trim().to_string();
 
     //TODO! Create an update fnc for the table
-    println!("\nEnter your rating: ");
+    println!(
+        "\n Enter => [cmp] for complete \n Enter => [ip] in progress \n Enter => [drp] dropped "
+    );
+    println!("\nEnter your status: ");
     let mut user_progress = String::new();
     let _ = io::stdin().read_line(&mut user_progress);
     let user_progress = user_progress.trim().to_string();
+
+    // Takes in user progress on anime show and updates table
+    if user_progress == "cmp" {
+        let _my_status = AnimeStatus::Completed;
+    } else if user_progress == "ip" {
+        let _my_status = AnimeStatus::InProgress;
+    } else if user_progress == "drp" {
+        let _my_status = AnimeStatus::Dropped;
+    } else {
+        let _my_status = AnimeStatus::PlanOnWatching;
+    }
 
     //Return the struct
     AnimeSheet {
@@ -73,6 +118,8 @@ pub fn create_table() -> Result<(), Box<dyn error::Error>> {
                 .append(true)
                 .create(true)
                 .open("anime.csv")?; // this only work if you are in src directory
+            //TODO! check current directory and move into src if not
+            //already in src
 
             let mut wtr = csv::WriterBuilder::new()
                 .has_headers(false)
@@ -124,9 +171,7 @@ pub fn update_table() {
     let _ = io::stdin().read_line(&mut update_entries);
     let update_entries = update_entries.trim();
     if update_entries == "y" {
-        std::process::Command::new("xdg-open")
-            .arg("anime.csv")
-            .spawn();
+        Command::new("xdg-open").arg("anime.csv").spawn();
     } else {
         exit(0);
     }
