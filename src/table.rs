@@ -6,7 +6,7 @@ use csv::{self};
 use serde_derive::{Deserialize, Serialize};
 use std::{
     io::{self, stdin},
-    process::exit,
+    process::{Command, exit},
 };
 
 // Table data input
@@ -41,7 +41,7 @@ pub fn fill_table() -> AnimeSheet {
     let _ = stdin().read_line(&mut user_rating);
     let user_rating = user_rating.trim().to_string();
 
-    //progress
+    //TODO! Create an update fnc for the table
     println!("\nEnter your rating: ");
     let mut user_progress = String::new();
     let _ = io::stdin().read_line(&mut user_progress);
@@ -112,6 +112,20 @@ pub fn create_table() -> Result<(), Box<dyn error::Error>> {
                 exit(0)
             }
         }
+    } else {
+        exit(0);
+    }
+}
+
+pub fn update_table() {
+    println!("Would you like to update any current entries in the table: ");
+    let mut update_entries = String::new();
+    io::stdin().read_line(&mut update_entries);
+    let update_entries = update_entries.trim();
+    if update_entries == "y" {
+        std::process::Command::new("xdg-open")
+            .arg("anime.csv")
+            .spawn();
     } else {
         exit(0);
     }
