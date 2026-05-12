@@ -4,7 +4,10 @@ use comfy_table::presets::UTF8_FULL;
 use core::error;
 use csv::{self};
 use serde_derive::{Deserialize, Serialize};
-use std::io::{self};
+use std::{
+    io::{self},
+    process::exit,
+};
 
 // Table data input
 #[derive(Serialize, Deserialize, Debug)]
@@ -14,6 +17,22 @@ pub struct AnimeSheet {
     pub episode_count: String,
     pub user_rating: String,
     //pub anime_status: String,
+}
+
+pub enum MyError {
+    NotValidOption,
+}
+
+pub fn add_row() -> Result<AnimeSheet, MyError> {
+    println!("Do want to enter another title: ");
+    let mut add_more = String::new();
+    let _ = io::stdin().read_line(&mut add_more);
+    let add_more = add_more.trim();
+    match add_more {
+        "y" => Ok(fill_table()),
+        "n" => exit(0),
+        _ => Err(MyError::NotValidOption),
+    }
 }
 
 // Take user input for filling out the spreadsheet
@@ -37,6 +56,8 @@ pub fn fill_table() -> AnimeSheet {
     let mut user_rating = String::new();
     let _ = io::stdin().read_line(&mut user_rating);
     let user_rating = user_rating.trim().to_string();
+
+    add_row();
 
     //TODO! //Create another column for progress/status
     //println!("\nEnter your rating: ");
