@@ -6,7 +6,7 @@ use csv::{self};
 use serde_derive::{Deserialize, Serialize};
 use std::{
     io::{self, stdin},
-    process::{Command, exit},
+    process::exit,
 };
 
 // Table data input
@@ -117,10 +117,11 @@ pub fn create_table() -> Result<(), Box<dyn error::Error>> {
     }
 }
 
+// Update the table manually by directly opening the csv file
 pub fn update_table() {
     println!("Would you like to update any current entries in the table: ");
     let mut update_entries = String::new();
-    io::stdin().read_line(&mut update_entries);
+    let _ = io::stdin().read_line(&mut update_entries);
     let update_entries = update_entries.trim();
     if update_entries == "y" {
         std::process::Command::new("xdg-open")
@@ -129,9 +130,4 @@ pub fn update_table() {
     } else {
         exit(0);
     }
-}
-
-pub fn draw_table() -> Result<(), Box<dyn std::error::Error>> {
-    //TODO Read csv and  print it out to terminal
-    Ok(())
 }
