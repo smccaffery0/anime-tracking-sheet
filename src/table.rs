@@ -2,9 +2,10 @@ use comfy_table::Table;
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use core::error;
-use csv::{self};
+use csv::{self, Reader, StringRecord};
 use serde_derive::{Deserialize, Serialize};
 use std::{
+    fs::File,
     io::{self, stdin},
     process::{Command, exit},
 };
@@ -29,7 +30,7 @@ pub enum AnimeStatus {
 }
 
 impl AnimeStatus {
-    fn check(&self) {
+    fn _check(&self) {
         match self {
             AnimeStatus::Completed => {
                 println!("Anime is completed");
@@ -104,42 +105,42 @@ pub fn fill_table() -> AnimeSheet {
 
 // Define the Table
 pub fn create_table() -> Result<(), Box<dyn error::Error>> {
+    let mut anime_table = Table::new();
+    // defines table properties
+    anime_table
+        .load_preset(UTF8_FULL)
+        .apply_modifier(UTF8_ROUND_CORNERS)
+        .set_content_arrangement(comfy_table::ContentArrangement::DynamicFullWidth)
+        .set_header(vec![
+            "Count",
+            "Title",
+            "Episodes",
+            "Rating",
+            "User Progress",
+        ]);
+
     println!("Do want to enter a title: ");
     let mut add_more = String::new();
     let _ = io::stdin().read_line(&mut add_more);
     let add_more = add_more.trim();
+
     if add_more == "y" {
         loop {
-            let sheet = fill_table();
-            let mut anime_table = Table::new();
-
             //Write and save to file
             let file = std::fs::OpenOptions::new()
                 .append(true)
                 .create(true)
                 .open("anime.csv")?; // this only work if you are in src directory
-            //TODO! check current directory and move into src if not
+            //TODO! //check current directory and move into src if not
             //already in src
 
             let mut wtr = csv::WriterBuilder::new()
                 .has_headers(false)
                 .from_writer(file);
 
+            let sheet = fill_table();
             wtr.serialize(&sheet)?;
             wtr.flush()?;
-
-            // defines table properties
-            anime_table
-                .load_preset(UTF8_FULL)
-                .apply_modifier(UTF8_ROUND_CORNERS)
-                .set_content_arrangement(comfy_table::ContentArrangement::DynamicFullWidth)
-                .set_header(vec![
-                    "Count",
-                    "Title",
-                    "Episodes",
-                    "Rating",
-                    "User Progress",
-                ]);
 
             let rows = vec![
                 &sheet.anime_count,
@@ -149,19 +150,23 @@ pub fn create_table() -> Result<(), Box<dyn error::Error>> {
                 &sheet.user_progress,
             ];
             anime_table.add_row(rows);
+
             println!("Do want to enter another title: ");
             let mut add_again = String::new();
             let _ = io::stdin().read_line(&mut add_again);
             let add_again = add_again.trim();
+
             if add_again == "y" {
                 fill_table();
             } else {
-                exit(0)
+                break;
             }
         }
     } else {
-        exit(0);
-    }
+        println!("{anime_table}");
+    } // end of loop
+    println!("{anime_table}");
+    Ok(())
 }
 
 // Update the table manually by directly opening the csv file
@@ -171,8 +176,46 @@ pub fn update_table() {
     let _ = io::stdin().read_line(&mut update_entries);
     let update_entries = update_entries.trim();
     if update_entries == "y" {
-        Command::new("xdg-open").arg("anime.csv").spawn();
+        let _ = Command::new("xdg-open").arg("anime.csv").spawn();
     } else {
         exit(0);
     }
+}
+
+// View table
+pub fn print_table() -> Result<(), Box<dyn std::error::Error>> {
+    // Open csv file and read each row
+    let open_file = File::open("anime.csv")?;
+    let mut rdr = Reader::from_reader(open_file);
+    let mut anime_data = Vec::new();
+
+    // Go through each row and the data into the vec
+    for final_table in rdr.records() {
+        let record = final_table?;
+        anime_data.push(record);
+    }
+
+    // Create a table
+    let mut anime_table = Table::new();
+    // defines table properties
+    anime_table
+        .load_preset(UTF8_FULL)
+        .apply_modifier(UTF8_ROUND_CORNERS)
+        .set_content_arrangement(comfy_table::ContentArrangement::DynamicFullWidth)
+        .set_header(vec![
+            "Count",
+            "Title",
+            "Episodes",
+            "Rating",
+            "User Progress",
+        ]);
+
+    // Iterates through row in the csv
+    // Add data from csv to each row in table
+    for record in &anime_data {
+        anime_table.add_row(record);
+    }
+    // View and print the table
+    println!("{anime_table}");
+    Ok(())
 }

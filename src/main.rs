@@ -2,7 +2,7 @@
 #![allow(clippy::cargo_common_metadata)]
 use std::{io, process::exit};
 
-use crate::table::{create_table, update_table};
+use crate::table::{create_table, print_table, update_table};
 mod table;
 
 // Display menu for user
@@ -24,7 +24,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // match based on user input
     match option_selected {
         "1" => create_table()?,
-        "2" => println!("Draw Table"),
+        "2" => print_table()?,
         "3" => update_table(),
         "4" => exit(0),
         _ => println!("Not an option!"),
